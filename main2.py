@@ -1,4 +1,4 @@
-import sys, logging, os, random, math, open_color, arcade
+import sys, logging, os, random, math, open_color, arcade, time
 
 #check to make sure we are running the right version of Python
 version = (3,7)
@@ -40,6 +40,25 @@ class Bullet(arcade.Sprite):
         self.center_x += self.dx
         self.center_y += self.dy
 
+class enemyBullet(arcade.Sprite):
+    def __init__(self, position, velocity, damage):
+        ''' 
+        initializes the bullet
+        Parameters: position: (x,y) tuple
+            velocity: (dx, dy) tuple
+            damage: int (or float)
+        '''
+        super().__init__("assets/bullet_enemy.png", 0.5)
+        (self.center_x, self.center_y) = position
+        (self.dx, self.dy) = velocity
+        self.damage = damage
+
+    def update(self):
+        '''
+        Moves the bullet
+        '''
+        self.center_x += self.dx
+        self.center_y += self.dy
 
     
 class Player(arcade.Sprite):
@@ -58,6 +77,7 @@ class Enemy(arcade.Sprite):
         (self.center_x, self.center_y) = position
 
 
+
         
 
 
@@ -71,6 +91,7 @@ class Window(arcade.Window):
         self.set_mouse_visible(True)
         arcade.set_background_color(open_color.blue_4)
         self.bullet_list = arcade.SpriteList()
+        self.enemyBullet_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
         self.player = Player()
         self.score = 0
@@ -87,8 +108,14 @@ class Window(arcade.Window):
 
     def update(self, delta_time):
         self.bullet_list.update()
+        self.enemyBullet_list.update()
         if self.enemy_list:
             for e in self.enemy_list:
+                x = e.center_x
+                y = e.center_y 
+                eBullet = enemyBullet((x,y),(0,-10), BULLET_DAMAGE)
+                self.enemyBullet_list.append(eBullet)
+                time.sleep(3)
                 collision = arcade.check_for_collision_with_list(e, self.bullet_list)
                 for c in collision:
                     e.hp -= c.damage
